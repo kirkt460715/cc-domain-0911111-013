@@ -5,6 +5,7 @@ from pathlib import Path
 from .validation import object_value, parse_json, canonical, reject, VaultError
 from .service import Vault
 from .releases.exporter import verify_directory
+from .analysis.package import verify_package
 
 
 def dispatch(vault, request):
@@ -96,6 +97,22 @@ def dispatch(vault, request):
         return vault.queries.lookup(**options)
     if action == "storage_usage":
         return vault.queries.storage_usage()
+    if action == "analysis_plan_define":
+        return vault.analysis_plans.define(**options)
+    if action == "analysis_plan_revise":
+        return vault.analysis_plans.revise(**options)
+    if action == "analysis_plan":
+        return vault.analysis_plans.get(options["id"], options.get("version"))
+    if action == "analysis_plan_versions":
+        return vault.analysis_plans.versions(options["id"])
+    if action == "analysis_run":
+        return vault.analysis_runs.run(**options)
+    if action == "analysis_run_get":
+        return vault.analysis_runs.get(options["id"])
+    if action == "analysis_package":
+        return vault.analysis_packages.export(**options)
+    if action == "analysis_package_verify":
+        return verify_package(options["path"])
     reject("input", "unknown action", action=action)
 
 
